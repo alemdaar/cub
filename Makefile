@@ -1,5 +1,5 @@
 NAME	:= cub3D
-CFLAGS	:= -Wextra -Wall -Werror -Wunreachable-code -O3
+# CFLAGS	:= -Wextra -Wall/ -Werror -Wunreachable-code -O3
 # CFLAGS	:= -Wextra -Wall -Werror -Wunreachable-code -O3 -DDEBUG
 LIBMLX	:= ./lib/mlx42
 LIBGLFW := $(shell brew --prefix glfw)

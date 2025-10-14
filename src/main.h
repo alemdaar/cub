@@ -5,11 +5,12 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include "../lib/mlx42/include/MLX42/MLX42.h"
 
 typedef struct s_player {
 	double x, y;
 	double angle;
-} Player;
+} t_Payer;
 
 typedef struct s_map {
 	bool success;
@@ -22,4 +23,9 @@ typedef struct s_map {
 	unsigned int ccolor;
 
 	char **map;
-} Map;
+} t_map;
+
+typedef struct s_game {
+	mlx_t			*mlx;
+	mlx_image_t*	img;
+} t_game;
