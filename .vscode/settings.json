@@ -3,6 +3,7 @@
         "mlx42.h": "c",
         "main.h": "c",
         "stdio.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "parse.h": "c"
     }
 }

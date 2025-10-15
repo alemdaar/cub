@@ -88,6 +88,63 @@ static bool setmap(Map *map, int f) {
 	return true;
 }
 
+int err_msg(const char *msg)
+{
+	write (2, msg, ft_strlen(msg));
+	return (0);
+}
+
+int is_symbol(char symbol)
+{
+	if (symbol == '1' || symbol == '0')
+		return (1);
+	if (symbol == 'N' || symbol == 'S')
+		return (1);
+	if (symbol == 'E' || symbol == 'W')
+		return (1);
+	return (0);
+}
+
+int	check_map(t_map *map)
+{
+	int i = 0;
+	int j = 0;
+	int store = 0;
+	int len = 0;
+	int last_pos = 0;
+	int sig = 0;
+
+	map->width = ft_strlen(map->map[i]);
+	if (map->width == 0)
+		return (err_msg(E_MAPL0), exit(0), 1);
+	else if (map->width < 3)
+		return (err_msg(E_MAPLS), exit(0), 1);
+	while (map->map[i])
+	{
+		store = ft_strlen(map->map[i]);
+		if (store != map->width)
+			return (err_msg(E_MAPLNQ), exit (1), 0);
+		while (map->map[i][j])
+		{
+			if (!is_symbol(map->map[i][j]))
+			{
+				if (map->map[i][j] == ' ')
+				{
+					while (map->map[i][j] == ' ' && map->map[i][j])
+					{
+						if ()
+					}
+					sig = 1;
+				}
+				return (err_msg(E_MAPSMB), exit (1), 0);
+			}
+			j++;
+		}
+		i++;
+	}
+	return (0);
+}
+
 // TODO need way more verificatiosn and cehcks for the format
 // or maybe split into one for parse and one for checks
 Map *loadmap(char *filename) {
@@ -104,6 +161,10 @@ Map *loadmap(char *filename) {
 		return map;
 	if (!setmap(map, f))
 		return map;
+	if (!check_map(map))
+		return map;
+	// if (!map_data(map))
+	// 	return 1;
 
 	map->success = true;
 	return map;

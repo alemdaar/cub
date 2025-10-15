@@ -7,6 +7,14 @@
 #include <unistd.h>
 #include "../lib/mlx42/include/MLX42/MLX42.h"
 
+#define	SUCCESSFUL 0
+#define	FAILED 1
+#define	E_ALLOC "Memory alocation failed !\n"
+#define	E_MAPLS "Map len is too small !\n"
+#define E_MAPLNQ "Map lens are not equal !\n"
+#define E_MAPL0 "Map len is 0 !\n"
+#define E_MAPSMB "Symbol is not correct !\n"
+
 typedef struct s_player {
 	double x, y;
 	double angle;
@@ -18,11 +26,11 @@ typedef struct s_map {
 	char *spath;
 	char *wpath;
 	char *epath;
-
+	char **map;
 	unsigned int fcolor;
 	unsigned int ccolor;
-
-	char **map;
+	int width;
+	int height;
 } t_map;
 
 typedef struct s_game {
