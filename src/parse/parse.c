@@ -1,5 +1,6 @@
 #include "../main.h"
 #include <stdint.h>
+#include <stdio.h>
 
 static bool settextures(Map *map, int f) {
 
@@ -8,7 +9,6 @@ static bool settextures(Map *map, int f) {
 		if (!line) {
 			return false;
 		}
-
 		char **split = ft_split(line, ' ');
 		// if (!split || !split[0]) {
 		// 	close(f);
