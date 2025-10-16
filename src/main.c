@@ -11,6 +11,14 @@
 #define BLACK	0x000000FF
 #define SQUARE_LEN	35
 #define PLAYER_LEN	15
+#define CENTER_RULE	17
+// center of the player is [89 , 53]
+// the highest pixel of the player is [89 , 46]
+// the lowest pixel of the player is [89 , 40]
+// the top right pixel of the player is [96 , 53]
+// the top left pixel of the player is [82 , 53]
+#define CIRCLE_RADIUS	7
+
 
 
 static void ft_error(void)
@@ -18,6 +26,24 @@ static void ft_error(void)
 	fprintf(stderr, "%s", mlx_strerror(mlx_errno));
 	exit(EXIT_FAILURE);
 }
+
+void draw_circle(mlx_image_t *img, int cx, int cy, int radius, uint32_t color)
+{
+    for (int y = -radius; y <= radius; y++)
+    {
+        for (int x = -radius; x <= radius; x++)
+        {
+            if (x * x + y * y <= radius * radius)
+            {
+                int px = cx + x;
+                int py = cy + y;
+                if (px >= 0 && px < (int)img->width && py >= 0 && py < (int)img->height)
+                    mlx_put_pixel(img, px, py, color);
+            }
+        }
+    }
+}
+
 void draw_2dsquare(t_game *game, char flag, int x, int y)
 {
 	int debug = open ("debug", O_CREAT | O_RDWR, 0777) ;
@@ -32,6 +58,8 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
     uint32_t	color;
 	int			rulex;
 	int			ruley;
+	int tmp_x;
+	int tmp_y;
 
 	red   = 0xFF0000FF;
     green = 0x00FF00FF;
@@ -39,21 +67,21 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 	rulex = 0;
 	ruley = 0;
 	if (x)
-	    rulex = ((x * SQUARE_LEN) + (x + 1));
+	    rulex = ((x * SQUARE_LEN) + x);
 	if (y)
-	    ruley = ((y * SQUARE_LEN) + (y + 1));
+	    ruley = ((y * SQUARE_LEN) + y);
 	if (flag == '1')
 		color = black;
 	else if (flag == '0')
 		color = green;
-	else if (flag == 'p')
+	else if (flag == 'p' || flag == 'N')
 	{
 		color = green;
-		int tmp_x = x;
-		int tmp_y = y;
-		uint32_t tmp_color = red;
+		tmp_x = rulex;
+		tmp_y = ruley;
 
 	}
+	printf ("initial state : [%d , %d]\n", rulex, ruley);
 	int i = 0;
 	int j = 0;
 	while (i < SQUARE_LEN)
@@ -66,13 +94,24 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 		}
 		i++;
 	}
+	if (flag == 'p' || flag == 'N')
+	{
+		printf (",,,,,,,,,,,,,\n");
+		color = red;
+		printf ("circle center : [%d , %d]\n", tmp_x, tmp_y);
+		x = tmp_x + CENTER_RULE;
+		y = tmp_y + CENTER_RULE;
+		printf ("circle center and rule : [%d , %d]\n", x, y);
+		color = red;
+		draw_circle(game->img, x, y, 7, color);
+	}
 }
 
 int draw_2dmap (t_map *map, t_game *game)
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < map->height; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < map->width; j++)
 		{
 			draw_2dsquare(game, map->map[i][j], j, i);
 		}

@@ -2,6 +2,12 @@
 #include <stdint.h>
 #include <stdio.h>
 
+int err_msg(const char *msg)
+{
+	write (2, msg, ft_strlen(msg));
+	return (0);
+}
+
 static bool settextures(Map *map, int f) {
 
 	for (int i = 0; i < 4; i++) {
@@ -76,11 +82,22 @@ static bool setcolors(Map *map, int f) {
 
 static bool setmap(Map *map, int f) {
 	map->map = malloc(sizeof(char *) * 1024);
+	if (!map->map)
+		return (err_msg(E_ALLOC), exit(1), 1);
 	char **m = map->map;
 	int i = 0;
+	int j;
 	char *line = get_next_line(f);
-	while (line) {
+	while (line)
+	{
 		m[i] = line;
+		j = 0;
+		while (m[i][j])
+		{
+			if (m[i][j] == '\n')
+				m[i][j] = 0;
+			j++;
+		}
 		i++;
 		line = get_next_line(f);
 	}
@@ -88,11 +105,7 @@ static bool setmap(Map *map, int f) {
 	return true;
 }
 
-int err_msg(const char *msg)
-{
-	write (2, msg, ft_strlen(msg));
-	return (0);
-}
+
 
 int is_symbol(char symbol)
 {
@@ -110,15 +123,15 @@ int	check_map(t_map *map)
 	int i = 0;
 	int j = 0;
 	int store = 0;
-	int len = 0;
-	int last_pos = 0;
-	int sig = 0;
+	// int sig = 0;
 
 	map->width = ft_strlen(map->map[i]);
 	if (map->width == 0)
-		return (err_msg(E_MAPL0), exit(0), 1);
+		return (err_msg(E_MAPL0), exit(1), 1);
 	else if (map->width < 3)
-		return (err_msg(E_MAPLS), exit(0), 1);
+	{
+		return (err_msg(E_MAPLS), exit(1), 1);
+	}
 	while (map->map[i])
 	{
 		store = ft_strlen(map->map[i]);
@@ -128,19 +141,26 @@ int	check_map(t_map *map)
 		{
 			if (!is_symbol(map->map[i][j]))
 			{
-				if (map->map[i][j] == ' ')
-				{
-					while (map->map[i][j] == ' ' && map->map[i][j])
-					{
-						if ()
-					}
-					sig = 1;
-				}
+				printf ("symbol : '%c'\n", map->map[i][j]);
+				// if (map->map[i][j] == ' ')
+				// {
+				// 	while (map->map[i][j] == ' ' && map->map[i][j])
+				// 	{
+				// 		if ()
+				// 	}
+				// 	sig = 1;
+				// }
 				return (err_msg(E_MAPSMB), exit (1), 0);
 			}
 			j++;
 		}
 		i++;
+	}
+	map->height = i;
+	if (map->height < 3)
+	{
+		printf ("height is small !\n");
+		return (err_msg(E_MAPLS), exit(1), 1);
 	}
 	return (0);
 }
