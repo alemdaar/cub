@@ -4,20 +4,7 @@
 #include <fcntl.h>
 
 #define DEBUG 1
-#define IMAC_WIDTH 5120
-#define IMAC_HEIGHT 2880
-#define RED     0xFF0000FF
-#define GREEN   0x00FF00FF
-#define BLACK	0x000000FF
-#define SQUARE_LEN	35
-#define PLAYER_LEN	15
-#define CENTER_RULE	17
-// center of the player is [89 , 53]
-// the highest pixel of the player is [89 , 46]
-// the lowest pixel of the player is [89 , 40]
-// the top right pixel of the player is [96 , 53]
-// the top left pixel of the player is [82 , 53]
-#define CIRCLE_RADIUS	7
+
 
 
 
@@ -27,13 +14,13 @@ static void ft_error(void)
 	exit(EXIT_FAILURE);
 }
 
-void draw_circle(mlx_image_t *img, int cx, int cy, int radius, uint32_t color)
+void draw_circle(mlx_image_t *img, int cx, int cy, uint32_t color)
 {
-    for (int y = -radius; y <= radius; y++)
+    for (int y = -CIRCLE_RADIUS; y <= CIRCLE_RADIUS; y++)
     {
-        for (int x = -radius; x <= radius; x++)
+        for (int x = -CIRCLE_RADIUS; x <= CIRCLE_RADIUS; x++)
         {
-            if (x * x + y * y <= radius * radius)
+            if (x * x + y * y <= CIRCLE_RADIUS * CIRCLE_RADIUS)
             {
                 int px = cx + x;
                 int py = cy + y;
@@ -42,6 +29,22 @@ void draw_circle(mlx_image_t *img, int cx, int cy, int radius, uint32_t color)
             }
         }
     }
+}
+
+int draw_direction2d(t_game *game, int x, int y, uint32_t color)
+{
+	int i = 0;
+	int j = 0;
+	while (i < SQUARE_LEN)
+	{
+		int j = 0;
+		while (j < SQUARE_LEN)
+		{
+			mlx_put_pixel(game->img, j + rulex, i + ruley, color);
+			j++;
+		}
+		i++;
+	}
 }
 
 void draw_2dsquare(t_game *game, char flag, int x, int y)
@@ -96,14 +99,12 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 	}
 	if (flag == 'p' || flag == 'N')
 	{
-		printf (",,,,,,,,,,,,,\n");
-		color = red;
-		printf ("circle center : [%d , %d]\n", tmp_x, tmp_y);
+		color = black;
 		x = tmp_x + CENTER_RULE;
 		y = tmp_y + CENTER_RULE;
-		printf ("circle center and rule : [%d , %d]\n", x, y);
+		draw_direction2d(game, x, y, color);
 		color = red;
-		draw_circle(game->img, x, y, 7, color);
+		draw_circle(game->img, x, y, color);
 	}
 }
 
@@ -118,13 +119,29 @@ int draw_2dmap (t_map *map, t_game *game)
 	}
 	return 0;
 }
-
-void handle_input(void* param)
+int right_rotate(t_game *game, t_map *map)
 {
-    mlx_t* mlx = (mlx_t*)param;
+	
+}
 
-    if (mlx_is_key_down(mlx, MLX_KEY_ESCAPE))
-        mlx_close_window(mlx); // closes the window safely
+int left_rotate(t_game *game, t_map *map)
+{
+
+}
+
+void handle_input(void *param)
+{
+	t_game *mlx;
+
+	mlx = (t_game*)param;
+
+	if (mlx_is_key_down(mlx, MLX_KEY_ESCAPE))
+		mlx_close_window(mlx); // closes the window safely
+	if (mlx_is_key_down(mlx, MLX_KEY_RIGHT))
+		right_rotate();
+	if (mlx_is_key_down(mlx, MLX_KEY_LEFT))
+		left_rotate();
+	
 }
 
 int main(int ac, char **av) {
@@ -136,7 +153,9 @@ int main(int ac, char **av) {
 		return 1;
 	}
 	map = loadmap(av[1]);
-	printf ("start mlx !\n");
+	game.cord[X] = 90;
+	game.cord[Y] = 0;
+	// printf ("start mlx !\n");
 	game.mlx = mlx_init(IMAC_WIDTH, IMAC_HEIGHT,"44", true);
 	if (!game.mlx)
 		ft_error();
@@ -144,7 +163,7 @@ int main(int ac, char **av) {
 	if (!game.img || (mlx_image_to_window(game.mlx, game.img, 0, 0) < 0))
 		ft_error();
 	draw_2dmap (map, &game);
-	mlx_loop_hook(game.mlx, handle_input, game.mlx);
+	mlx_loop_hook(game.mlx, handle_input, &game);
 	mlx_loop(game.mlx);
 	mlx_terminate(game.mlx);
 	return (EXIT_SUCCESS);
