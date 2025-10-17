@@ -16,11 +16,14 @@ static void ft_error(void)
 
 void draw_circle(mlx_image_t *img, int cx, int cy, uint32_t color)
 {
-    for (int y = -CIRCLE_RADIUS; y <= CIRCLE_RADIUS; y++)
+	int	radius;
+
+	radius = CIRCLE_RADIUS;
+    for (int y = -radius; y <= radius; y++)
     {
-        for (int x = -CIRCLE_RADIUS; x <= CIRCLE_RADIUS; x++)
+        for (int x = -radius; x <= radius; x++)
         {
-            if (x * x + y * y <= CIRCLE_RADIUS * CIRCLE_RADIUS)
+            if (x * x + y * y <= radius * radius)
             {
                 int px = cx + x;
                 int py = cy + y;
@@ -31,21 +34,34 @@ void draw_circle(mlx_image_t *img, int cx, int cy, uint32_t color)
     }
 }
 
-int draw_direction2d(t_game *game, int x, int y, uint32_t color)
-{
-	int i = 0;
-	int j = 0;
-	while (i < SQUARE_LEN)
-	{
-		int j = 0;
-		while (j < SQUARE_LEN)
-		{
-			mlx_put_pixel(game->img, j + rulex, i + ruley, color);
-			j++;
-		}
-		i++;
-	}
-}
+// int draw_direction2d(t_game *game, int sx, int sy, uint32_t color)
+// {
+// 	int i = 0;
+// 	int j = 0;
+// 	int deltay = 0;
+// 	int deltax = 0;
+// 	// int m = 0;
+// 	int steps = 0;
+// 	double xinc = 0;
+// 	double yinc = 0;
+
+// 	deltax = game->cord[X] - sx;
+// 	deltay = game->cord[Y] - sy;
+// 	if (deltax > deltay)
+// 		steps = deltax;
+// 	else
+// 		steps = deltay;
+// 	while (i < SQUARE_LEN)
+// 	{
+// 		int j = 0;
+// 		while (j < SQUARE_LEN)
+// 		{
+// 			mlx_put_pixel(game->img, j + rulex, i + ruley, color);
+// 			j++;
+// 		}
+// 		i++;
+// 	}
+// }
 
 void draw_2dsquare(t_game *game, char flag, int x, int y)
 {
@@ -102,7 +118,7 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 		color = black;
 		x = tmp_x + CENTER_RULE;
 		y = tmp_y + CENTER_RULE;
-		draw_direction2d(game, x, y, color);
+		// draw_direction2d(game, x, y, color);
 		color = red;
 		draw_circle(game->img, x, y, color);
 	}
@@ -119,28 +135,28 @@ int draw_2dmap (t_map *map, t_game *game)
 	}
 	return 0;
 }
-int right_rotate(t_game *game, t_map *map)
-{
+// int right_rotate(t_game *game, t_map *map)
+// {
 	
-}
+// }
 
-int left_rotate(t_game *game, t_map *map)
-{
+// int left_rotate(t_game *game, t_map *map)
+// {
 
-}
+// }
 
 void handle_input(void *param)
 {
-	t_game *mlx;
+	t_game *game;
 
-	mlx = (t_game*)param;
+	game = (t_game*)param;
 
-	if (mlx_is_key_down(mlx, MLX_KEY_ESCAPE))
-		mlx_close_window(mlx); // closes the window safely
-	if (mlx_is_key_down(mlx, MLX_KEY_RIGHT))
-		right_rotate();
-	if (mlx_is_key_down(mlx, MLX_KEY_LEFT))
-		left_rotate();
+	if (mlx_is_key_down(game->mlx, MLX_KEY_ESCAPE))
+		mlx_close_window(game->mlx); // closes the window safely
+	// if (mlx_is_key_down(mlx, MLX_KEY_RIGHT))
+	// 	right_rotate();
+	// if (mlx_is_key_down(mlx, MLX_KEY_LEFT))
+	// 	left_rotate();
 	
 }
 
