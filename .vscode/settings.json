@@ -4,6 +4,9 @@
         "main.h": "c",
         "stdio.h": "c",
         "stdint.h": "c",
-        "parse.h": "c"
+        "parse.h": "c",
+        "math.h": "c",
+        "unistd.h": "c",
+        "stdbool.h": "c"
     }
 }
