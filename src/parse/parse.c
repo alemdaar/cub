@@ -8,7 +8,7 @@ int err_msg(const char *msg)
 	return (0);
 }
 
-static bool settextures(Map *map, int f) {
+static bool settextures(t_map *map, int f) {
 
 	for (int i = 0; i < 4; i++) {
 		char *line = get_next_line(f);
@@ -56,7 +56,7 @@ static void freesplit(char **split) {
 	free(split);
 }
 
-static bool setcolors(Map *map, int f) {
+static bool setcolors(t_map *map, int f) {
 	for (int i = 0; i < 2; i++) {
 		char *line = get_next_line(f);
 		if (!line)
@@ -80,7 +80,7 @@ static bool setcolors(Map *map, int f) {
 	return true;
 }
 
-static bool setmap(Map *map, int f) {
+static bool setmap(t_map *map, int f) {
 	map->map = malloc(sizeof(char *) * 1024);
 	if (!map->map)
 		return (err_msg(E_ALLOC), exit(1), 1);
@@ -107,54 +107,60 @@ static bool setmap(Map *map, int f) {
 
 
 
-int is_symbol(char symbol)
-{
-	if (symbol == '1' || symbol == '0')
-		return (1);
-	if (symbol == 'N' || symbol == 'S')
-		return (1);
-	if (symbol == 'E' || symbol == 'W')
-		return (1);
-	return (0);
-}
+// int is_symbol(char symbol)
+// {
+// 	if (symbol == '1' || symbol == '0')
+// 		return (1);
+// 	if (symbol == 'N' || symbol == 'S')
+// 		return (1);
+// 	if (symbol == 'E' || symbol == 'W')
+// 		return (1);
+// 	return (0);
+// }
 
-int locken_line(char *str)
-{
-	int i = 0;
+// int locken_line(char *str)
+// {
+// 	int i = 0;
 
-	while (str[i] == ' ')
-	{
+// 	while (str[i] == ' ')
+// 	{
 		
-	}
-	if (!str[i])
-		return (1);
-}
+// 	}
+// 	if (!str[i])
+// 		return (1);
+// }
 
 
 
-void	flood_fill(t_map *map, t_game *game, int daline, int daindex)
-{
-	if (daline < 0 || map->map[daline] == 0)
-		return ;
-	if (daindex < 0 || map->map[daline][daindex] == 0)
-		return ;
-	if (map->map[daline][daindex] == WALL)
-		return ;
-	if (map->map[daline][daindex] == 'X')
-		return ;
-	if (map->map[daline][daindex] == EXIT)
-	{
-		map->map[daline][daindex] = 'X';
-		return ;
-	}
-	if (map->map[daline][daindex] != 'X')
-		map->map[daline][daindex] = WALL;
-	flood_fill(map, dafile, daline + 1, daindex);
-	flood_fill(map, dafile, daline - 1, daindex);
-	flood_fill(map, dafile, daline, daindex + 1);
-	flood_fill(map, dafile, daline, daindex - 1);
-	return ;
-}
+// void	flood_fill(t_map *map, int y, int x)
+// {
+// 	if (map->not_valid == 1)
+// 		return ;
+// 	if (y < 0 || map->map[y] == 0)
+// 	{
+// 		map->not_valid = 1;
+// 		return ;
+// 	}
+// 	if (x < 0 || map->map[y][x] == 0)
+// 	{
+// 		map->not_valid = 1;
+// 		return ;
+// 	}
+// 	if (map->map[y][x] == WALL || map->map[y][x] == 'X')
+// 		return ;
+// 	if (map->map[y][x] == ' ')
+// 	{
+// 		map->not_valid = 1;
+// 		return ;
+// 	}
+// 	if (map->map[y][x] == '0')
+// 		map->map[y][x] = 'X';
+// 	flood_fill(map, y + 1, x);
+// 	flood_fill(map, y - 1, x);
+// 	flood_fill(map, y, x + 1);
+// 	flood_fill(map, y, x - 1);
+// 	return ;
+// }
 
 int is_player(char c)
 {
@@ -163,15 +169,114 @@ int is_player(char c)
 	return (0);
 }
 
-static int	check_map(t_map *map)
+// int copy_map(t_map *map)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	while (map->map[i])
+// 		i++;
+// 	map->tmp_map = malloc(sizeof(char *) * i + 1);
+// 	if (!map->tmp_map)
+// 		return (err_msg(E_ALLOC), /*free_map(map)*/, (exit(1), 1);
+// 	i = 0;
+// 	int j;
+// 	while (map->map[i])
+// 	{
+// 		map->tmp_map[i] = malloc (ft_strlen(map->map[i]) + 1);
+// 		j = 0;
+// 		while (map->map[i][j])
+// 		{
+// 			map->tmp_map[i][j] = map->map[i][j];
+// 			j++;
+// 		}
+// 		map->tmp_map[i][j] = 0;
+// 		i++;
+// 	}
+// }
+
+// static int	check_map(t_map *map)
+// {
+// 	int i = 0;
+// 	int j = 0;
+// 	int store = 0;
+// 	int sig = 0;
+// 	int len = 0;
+
+// 	i = 0;
+// 	// copy_map(map);
+// 	// map->not_valid = 0;
+// 	// while (map->map[i])
+// 	// {
+// 	// 	j = 0;
+// 	// 	while (map->map[i][j])
+// 	// 	{
+// 	// 		if (is_player(map->map[i][j]))
+// 	// 		{
+// 	// 			flood_fill(map, i, j);
+// 	// 			return ;
+// 	// 		}
+// 	// 		j ++;
+// 	// 	}
+// 	// 	i ++;
+// 	// }
+// 	// while (map->map[i])
+// 	// {
+// 	// 	len = ft_strlen(map->map[i]);
+// 	// 	if (len == 0)
+// 	// 		return (err_msg(E_MAPL0), exit(1), 1);
+// 	// 	else if (len < 3)
+// 	// 		return (err_msg(E_MAPLS), exit(1), 1);
+// 	// 	else if (locken_line(map->map[i]))
+// 	// 	{
+// 	// 		return (err_msg(E_MAPLS), exit(1), 1);
+// 	// 	}
+// 	// 	store = ft_strlen(map->map[i]);
+// 	// 	if (store != map->width)
+// 	// 		return (err_msg(E_MAPLNQ), exit (1), 0);
+// 	// 	while (map->map[i][j])
+// 	// 	{
+// 	// 		if (!is_symbol(map->map[i][j]))
+// 	// 		{
+// 	// 			printf ("symbol : '%c'\n", map->map[i][j]);
+// 	// 			if (map->map[i][j] == ' ')
+// 	// 			{
+// 	// 				while (map->map[i][j] == ' ' && map->map[i][j])
+// 	// 				{
+// 	// 					if ()
+// 	// 				}
+// 	// 				sig = 1;
+// 	// 			}
+// 	// 			return (err_msg(E_MAPSMB), exit (1), 0);
+// 	// 		}
+// 	// 		j++;
+// 	// 	}
+// 	// 	i++;
+// 	// }
+// 	// map->height = i;
+// 	// if (map->height < 3)
+// 	// {
+// 	// 	printf ("height is small !\n");
+// 	// 	return (err_msg(E_MAPLS), exit(1), 1);
+// 	// }
+// 	return (0);
+// }
+
+
+static t_map *map_data(t_game *game, t_map *map)
 {
-	int i = 0;
-	int j = 0;
-	int store = 0;
-	int sig = 0;
-	int len = 0;
+	game->ep_dir[X] = 90;
+	game->ep_dir[Y] = 0;
+	game->map = map;
+}
+int	find_player(t_map *map, t_game *game)
+{
+	int	i;
+	int	j;
 
 	i = 0;
+	// copy_map(map);
+	map->not_valid = 0;
 	while (map->map[i])
 	{
 		j = 0;
@@ -179,68 +284,37 @@ static int	check_map(t_map *map)
 		{
 			if (is_player(map->map[i][j]))
 			{
-				flood_fill(map, game, i, j);
-				return ;
+				game->player_pos[X] = j;
+				game->player_pos[Y] = i;
+				if (game->player_pos[X])
+	    			game->sp_dir[X] = ((game->player_pos[X] * SQUARE_LEN) + game->player_pos[X]);
+				if (game->player_pos[Y])
+	    			game->sp_dir[Y] = ((game->player_pos[Y] * SQUARE_LEN) + game->player_pos[Y]);
+				game->sp_dir[X] += CENTER_RULE;
+				game->sp_dir[Y] += CENTER_RULE;
+				game->player_pos[X] = j;
+				game->player_pos[Y] = i;
+				printf ("sp_dir[X] : %d\n", game->sp_dir[X]);
+				printf ("sp_dir[Y] : %d\n", game->sp_dir[Y]);
+				printf ("player_pos[X] : %d\n", game->player_pos[X]);
+				printf ("player_pos[Y] : %d\n", game->player_pos[Y]);
+				// while (1);
+				return (0);
 			}
 			j ++;
 		}
 		i ++;
 	}
-	while (map->map[i])
-	{
-		len = ft_strlen(map->map[i]);
-		if (len == 0)
-			return (err_msg(E_MAPL0), exit(1), 1);
-		else if (len < 3)
-			return (err_msg(E_MAPLS), exit(1), 1);
-		else if (locken_line(map->map[i]))
-		{
-			return (err_msg(E_MAPLS), exit(1), 1);
-		}
-		store = ft_strlen(map->map[i]);
-		if (store != map->width)
-			return (err_msg(E_MAPLNQ), exit (1), 0);
-		while (map->map[i][j])
-		{
-			if (!is_symbol(map->map[i][j]))
-			{
-				printf ("symbol : '%c'\n", map->map[i][j]);
-				if (map->map[i][j] == ' ')
-				{
-					while (map->map[i][j] == ' ' && map->map[i][j])
-					{
-						if ()
-					}
-					sig = 1;
-				}
-				return (err_msg(E_MAPSMB), exit (1), 0);
-			}
-			j++;
-		}
-		i++;
-	}
-	map->height = i;
-	if (map->height < 3)
-	{
-		printf ("height is small !\n");
-		return (err_msg(E_MAPLS), exit(1), 1);
-	}
-	return (0);
-}
-static t_map *map_data(t_game *game, t_map *map)
-{
-	game->cord[X] = 90;
-	game->cord[Y] = 0;
-	game->map = map;
-	// get_map_width();
-	// get_map_height();
+	printf ("there is no player !\n");
+	exit(1);
+	// return (1);
 }
 
 // TODO need way more verificatiosn and cehcks for the format
 // or maybe split into one for parse and one for checks
-Map *loadmap(char *filename, t_game *game)
+t_map *loadmap(char *filename, t_game *game)
 {
-	Map *map = malloc(sizeof(Map));
+	t_map *map = malloc(sizeof(t_map));
 	map->success = false;
 
 	int f = open(filename, O_RDONLY);
@@ -253,8 +327,9 @@ Map *loadmap(char *filename, t_game *game)
 		return map;
 	if (!setmap(map, f))
 		return map;
-	if (!check_map(map))
-		return map;
+	find_player(map, game);
+	// if (!check_map(map))
+	// 	return map;
 	if (!map_data(game, map))
 		return map;
 

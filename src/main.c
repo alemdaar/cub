@@ -36,8 +36,8 @@ void draw_circle(mlx_image_t *img, int cx, int cy, uint32_t color)
 
 int draw_direction2d(t_game *game, int sx, int sy, uint32_t color)
 {
-    int dx = game->cord[X] - sx;
-    int dy = game->cord[Y] - sy;
+    int dx = game->ep_dir[X] - sx;
+    int dy = game->ep_dir[Y] - sy;
     int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
     double Xinc = dx / (double)steps;
     double Yinc = dy / (double)steps;
@@ -52,11 +52,17 @@ int draw_direction2d(t_game *game, int sx, int sy, uint32_t color)
 	return (0);
 }
 
+int pixelize(int x)
+{
+	if (x)
+	    rulex = ((x * SQUARE_LEN) + x);
+}
 void draw_2dsquare(t_game *game, char flag, int x, int y)
 {
 	uint32_t	red;
     uint32_t	green;
     uint32_t	black;
+	uint32_t	brown;
     uint32_t	color;
 	int			rulex;
 	int			ruley;
@@ -66,6 +72,7 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 	red   = 0xFF0000FF;
     green = 0x00FF00FF;
     black = 0x000000FF;
+	brown  = 0x8B4513FF;
 	rulex = 0;
 	ruley = 0;
 	if (x)
@@ -81,7 +88,6 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 		color = green;
 		tmp_x = rulex;
 		tmp_y = ruley;
-
 	}
 	// printf ("initial state : [%d , %d]\n", rulex, ruley);
 	int i = 0;
@@ -116,60 +122,68 @@ int draw_2dmap (t_game *game)
 	{
 		for (int j = 0; j < MAP2D_LEN; j++)
 		{
-			draw_2dsquare(game, map->map[i][j], j, i);
+			// if (game)
+			// 	printf ("game yes \n");
+			// else
+			// 	printf ("game no \n");
+			// if (map->map[i][j])
+			// 	printf ("map yes \n");
+			// else
+			// 	printf ("map no \n");
+			draw_2dsquare(game, map, (game->player_pos[X] - 2) + j, (game->player_pos[Y] - 2) + i);
 		}
 	}
 	return 0;
 }
 int right_rotate(t_game *game)
 {
-	if (game->cord[Y] == 0 && game->cord[X] < 180)
+	if (game->ep_dir[Y] == 0 && game->ep_dir[X] < 180)
 	{
 		printf ("its upper !\n");
-		game->cord[X] += 1;
+		game->ep_dir[X] += 1;
 	}
-	else if (game->cord[X] == 180 && game->cord[Y] < 180)
+	else if (game->ep_dir[X] == 180 && game->ep_dir[Y] < 180)
 	{
 		printf ("its top right !\n");
-		game->cord[Y] += 1;
+		game->ep_dir[Y] += 1;
 	}
-	else if (game->cord[Y] == 180 && game->cord[X] > 0)
+	else if (game->ep_dir[Y] == 180 && game->ep_dir[X] > 0)
 	{
 		printf ("its lower !\n");
-		game->cord[X] -= 1;
+		game->ep_dir[X] -= 1;
 	}
 	else
 	{
 		printf ("its top left !\n");
-		game->cord[Y] -= 1;
+		game->ep_dir[Y] -= 1;
 	}
-	printf ("End point : [%d , %d]\n", game->cord[X], game->cord[Y]);
+	printf ("End point : [%d , %d]\n", game->ep_dir[X], game->ep_dir[Y]);
 	return (0);
 }
 
 int left_rotate(t_game *game)
 {
-	if (game->cord[Y] == 0 && game->cord[X] > 0)
+	if (game->ep_dir[Y] == 0 && game->ep_dir[X] > 0)
 	{
 		printf ("its upper !\n");
-		game->cord[X] -= 1;
+		game->ep_dir[X] -= 1;
 	}
-	else if (game->cord[X] == 0 && game->cord[Y] < 180)
+	else if (game->ep_dir[X] == 0 && game->ep_dir[Y] < 180)
 	{
 		printf ("its top left !\n");
-		game->cord[Y] += 1;
+		game->ep_dir[Y] += 1;
 	}
-	else if (game->cord[Y] == 180 && game->cord[X] < 180)
+	else if (game->ep_dir[Y] == 180 && game->ep_dir[X] < 180)
 	{
 		printf ("its lower !\n");
-		game->cord[X] += 1;
+		game->ep_dir[X] += 1;
 	}
 	else
 	{
 		printf ("its top right !\n");
-		game->cord[Y] -= 1;
+		game->ep_dir[Y] -= 1;
 	}
-	printf ("End point : [%d , %d]\n", game->cord[X], game->cord[Y]);
+	printf ("End point : [%d , %d]\n", game->ep_dir[X], game->ep_dir[Y]);
 	return (0);
 }
 
@@ -205,8 +219,8 @@ void handle_input(void *param1)
 		right_rotate(game);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_LEFT))
 		left_rotate(game);
-	// if (mlx_is_key_down(game->mlx, MLX_KEY_W))
-	// 	go_forward(game);
+	if (mlx_is_key_down(game->mlx, MLX_KEY_W))
+		go_forward(game);
 	// if (mlx_is_key_down(game->mlx, MLX_KEY_A))
 	// 	go_left(game);
 	// if (mlx_is_key_down(game->mlx, MLX_KEY_S))
@@ -225,8 +239,9 @@ int main(int ac, char **av) {
 		puts("Usage: ./cub3d <path/to/map.cub>");
 		return 1;
 	}
-	map = loadmap(av[1], &game);
 	// printf ("start mlx !\n");
+	game.map = map;
+	map = loadmap(av[1], &game);
 	game.mlx = mlx_init(IMAC_WIDTH_DEBUG, IMAC_HEIGHT,"44", true);
 	if (!game.mlx)
 		ft_error();

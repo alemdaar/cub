@@ -27,13 +27,13 @@
 #define PLAYER_LEN			15
 #define CENTER_RULE			17
 #define MAP2D_LEN			5
-#define MAP2D_START_POINT	5
 // center of the player is [89 , 53]
 // the highest pixel of the player is [89 , 46]
 // the lowest pixel of the player is [89 , 40]
 // the top right pixel of the player is [96 , 53]
 // the top left pixel of the player is [82 , 53]
 #define CIRCLE_RADIUS	7
+#define MAX_SQUARES_2D	7
 // 
 # define WALL 49
 # define EMPTY 48
@@ -50,15 +50,22 @@ typedef struct s_map {
 	char *wpath;
 	char *epath;
 	char **map;
+	char **tmp_map;
 	unsigned int fcolor;
 	unsigned int ccolor;
 	int width;
 	int height;
+	int not_valid;
 } t_map;
 
 typedef struct s_game {
 	mlx_t			*mlx;
 	mlx_image_t*	img;
-	int				cord[2];
+	int				ep_dir[2];
+	int				sp_dir[2];
+	int				player_pos[2];
 	t_map			*map;
 } t_game;
+
+
+t_map *loadmap(char *filename, t_game *game);
