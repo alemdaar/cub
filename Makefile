@@ -6,9 +6,9 @@ LIBGLFW := $(shell brew --prefix glfw)
 LIBFT := lib/libft/libft.a
 
 HEADERS	:= -I src/ -I $(LIBMLX)/include
-LIBS	:= $(LIBMLX)/build/libmlx42.a $(LIBFT) -ldl $(LIBGLFW)/lib/libglfw3.a -pthread -lm -framework Cocoa -framework OpenGL -framework IOKit
+LIBS	:= $(LIBMLX)/build/libmlx42.a $(LIBFT) -ldl $(LIBGLFW)/lib/libglfw3.a -lm -framework Cocoa -framework OpenGL -framework IOKit
 SRCS	:= $(shell find ./src -iname "*.c") lib/gnl/get_next_line.c lib/gnl/get_next_line_utils.c
-			
+
 OBJS	:= ${SRCS:.c=.o}
 CC		:= cc
 

@@ -3,11 +3,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#define DEBUG 1
-
-
-
-
 static void ft_error(void)
 {
 	fprintf(stderr, "%s", mlx_strerror(mlx_errno));
@@ -34,30 +29,25 @@ void draw_circle(mlx_image_t *img, int cx, int cy, uint32_t color)
     }
 }
 
-int draw_direction2d(t_game *game, int sx, int sy, uint32_t color)
-{
-    int dx = game->ep_dir[X] - sx;
-    int dy = game->ep_dir[Y] - sy;
-    int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
-    double Xinc = dx / (double)steps;
-    double Yinc = dy / (double)steps;
-    double x = sx;
-    double y = sy;
-    for (int i = 0; i <= steps; i++) {
-        mlx_put_pixel(game->img, round(x), round(y), color);
-		// dprintf (3, "x : %f, y : %f\n", x, y);
-        x += Xinc;
-        y += Yinc;
-    }
-	return (0);
-}
+// int dda(t_game *game, int sx, int sy, uint32_t color)
+// {
+//     int dx = game->ep_dir[X] - sx;
+//     int dy = game->ep_dir[Y] - sy;
+//     int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+//     double Xinc = dx / (double)steps;
+//     double Yinc = dy / (double)steps;
+//     double x = sx;
+//     double y = sy;
+//     for (int i = 0; i <= steps; i++) {
+//         mlx_put_pixel(game->img, round(x), round(y), color);
+//         x += Xinc;
+//         y += Yinc;
+//     }
+// 	return (0);
+// }
 
-int pixelize(int x)
-{
-	if (x)
-	    rulex = ((x * SQUARE_LEN) + x);
-}
-void draw_2dsquare(t_game *game, char flag, int x, int y)
+void draw_2dsquare(t_game *game, t_map *map, int x, int y)
+
 {
 	uint32_t	red;
     uint32_t	green;
@@ -68,6 +58,7 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 	int			ruley;
 	int tmp_x;
 	int tmp_y;
+	char flag;
 
 	red   = 0xFF0000FF;
     green = 0x00FF00FF;
@@ -75,6 +66,7 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 	brown  = 0x8B4513FF;
 	rulex = 0;
 	ruley = 0;
+	flag = map->map[y][x];
 	if (x)
 	    rulex = ((x * SQUARE_LEN) + x);
 	if (y)
@@ -89,9 +81,7 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 		tmp_x = rulex;
 		tmp_y = ruley;
 	}
-	// printf ("initial state : [%d , %d]\n", rulex, ruley);
 	int i = 0;
-	int j = 0;
 	while (i < SQUARE_LEN)
 	{
 		int j = 0;
@@ -104,7 +94,6 @@ void draw_2dsquare(t_game *game, char flag, int x, int y)
 	}
 	if (flag == 'p' || flag == 'N')
 	{
-		// color = black;
 		x = tmp_x + CENTER_RULE;
 		y = tmp_y + CENTER_RULE;
 		// dda(game, x, y, color);
@@ -122,15 +111,7 @@ int draw_2dmap (t_game *game)
 	{
 		for (int j = 0; j < MAP2D_LEN; j++)
 		{
-			// if (game)
-			// 	printf ("game yes \n");
-			// else
-			// 	printf ("game no \n");
-			// if (map->map[i][j])
-			// 	printf ("map yes \n");
-			// else
-			// 	printf ("map no \n");
-			draw_2dsquare(game, map, (game->player_pos[X] - 2) + j, (game->player_pos[Y] - 2) + i);
+			draw_2dsquare(game, map, j, i);
 		}
 	}
 	return 0;
@@ -219,8 +200,8 @@ void handle_input(void *param1)
 		right_rotate(game);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_LEFT))
 		left_rotate(game);
-	if (mlx_is_key_down(game->mlx, MLX_KEY_W))
-		go_forward(game);
+	// if (mlx_is_key_down(game->mlx, MLX_KEY_W))
+	// 	go_forward(game);
 	// if (mlx_is_key_down(game->mlx, MLX_KEY_A))
 	// 	go_left(game);
 	// if (mlx_is_key_down(game->mlx, MLX_KEY_S))
@@ -239,7 +220,6 @@ int main(int ac, char **av) {
 		puts("Usage: ./cub3d <path/to/map.cub>");
 		return 1;
 	}
-	// printf ("start mlx !\n");
 	game.map = map;
 	map = loadmap(av[1], &game);
 	game.mlx = mlx_init(IMAC_WIDTH_DEBUG, IMAC_HEIGHT,"44", true);

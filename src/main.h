@@ -43,6 +43,8 @@ typedef struct s_player {
 	double angle;
 } t_Payer;
 
+
+
 typedef struct s_map {
 	bool success;
 	char *npath;
@@ -56,6 +58,7 @@ typedef struct s_map {
 	int width;
 	int height;
 	int not_valid;
+	
 } t_map;
 
 typedef struct s_game {
