@@ -39,9 +39,13 @@
 # define EMPTY 48
 
 typedef struct s_player {
-	double x, y;
-	double angle;
-} t_Payer;
+	int		player_pos[2];
+	double	sp_dir[2];
+	double	pa;
+	double	pdx;
+	double	pdy;
+	int		ep_dir[2];
+} t_player;
 
 
 
@@ -64,11 +68,9 @@ typedef struct s_map {
 typedef struct s_game {
 	mlx_t			*mlx;
 	mlx_image_t*	img;
-	int				ep_dir[2];
-	int				sp_dir[2];
-	int				player_pos[2];
 	t_map			*map;
+	t_player		*player;
 } t_game;
 
 
-t_map *loadmap(char *filename, t_game *game);
+t_map *loadmap(char *filename, t_game *game, t_player *player);

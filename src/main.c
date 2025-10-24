@@ -66,9 +66,12 @@ void draw_2dsquare(t_game *game, t_map *map, int x, int y)
 	brown  = 0x8B4513FF;
 	rulex = 0;
 	ruley = 0;
+	double pixelx = 0;
+	double pixely = 0;
 	flag = map->map[y][x];
+	pixelx = (x * SQUARE_LEN);
 	if (x)
-	    rulex = ((x * SQUARE_LEN) + x);
+	    rulex = pixelx + x);
 	if (y)
 	    ruley = ((y * SQUARE_LEN) + y);
 	if (flag == '1')
@@ -107,76 +110,54 @@ int draw_2dmap (t_game *game)
 	t_map *map;
 
 	map = game->map;
-	for (int i = 0; i < MAP2D_LEN; i++)
+	for (int i = 0; map->map[i]; i++)
 	{
-		for (int j = 0; j < MAP2D_LEN; j++)
+		for (int j = 0; j < map->map[i]; j++)
 		{
 			draw_2dsquare(game, map, j, i);
 		}
 	}
 	return 0;
 }
-int right_rotate(t_game *game)
+int right_rotate(t_game *game, t_player *player)
 {
-	if (game->ep_dir[Y] == 0 && game->ep_dir[X] < 180)
-	{
-		printf ("its upper !\n");
-		game->ep_dir[X] += 1;
-	}
-	else if (game->ep_dir[X] == 180 && game->ep_dir[Y] < 180)
-	{
-		printf ("its top right !\n");
-		game->ep_dir[Y] += 1;
-	}
-	else if (game->ep_dir[Y] == 180 && game->ep_dir[X] > 0)
-	{
-		printf ("its lower !\n");
-		game->ep_dir[X] -= 1;
-	}
-	else
-	{
-		printf ("its top left !\n");
-		game->ep_dir[Y] -= 1;
-	}
-	printf ("End point : [%d , %d]\n", game->ep_dir[X], game->ep_dir[Y]);
+	player->pa -= 5;                   // turn 5 degrees right
+	if (player->pa < 0)
+	    player->pa += 360;             // wrap to 359° instead of negative
+	player->pdx = cos(player->pa * M_PI / 180.0);
+	player->pdy = -sin(player->pa * M_PI / 180.0);
 	return (0);
 }
 
-int left_rotate(t_game *game)
+int left_rotate(t_game *game, t_player *player)
 {
-	if (game->ep_dir[Y] == 0 && game->ep_dir[X] > 0)
-	{
-		printf ("its upper !\n");
-		game->ep_dir[X] -= 1;
-	}
-	else if (game->ep_dir[X] == 0 && game->ep_dir[Y] < 180)
-	{
-		printf ("its top left !\n");
-		game->ep_dir[Y] += 1;
-	}
-	else if (game->ep_dir[Y] == 180 && game->ep_dir[X] < 180)
-	{
-		printf ("its lower !\n");
-		game->ep_dir[X] += 1;
-	}
-	else
-	{
-		printf ("its top right !\n");
-		game->ep_dir[Y] -= 1;
-	}
-	printf ("End point : [%d , %d]\n", game->ep_dir[X], game->ep_dir[Y]);
+	player->pa += 5;                   // turn 5 degrees left
+	if (player->pa >= 360)
+	    player->pa -= 360;             // wrap back to 0°
+	player->pdx = cos(player->pa * M_PI / 180.0);
+	player->pdy = -sin(player->pa * M_PI / 180.0);
 	return (0);
 }
 
-// int go_forward(t_game *game)
-// {
+int go_forward(t_game *game)
+{
+	t_player *player;
 
-// }
+	player = game->player;
+	// move forward (W key)
+	player->sp_dir[X] += player->pdx * 5;
+	player->sp_dir[Y] += player->pdy * 5;
+}
 
-// int go_back(t_game *game)
-// {
+int go_back(t_game *game)
+{
+	t_player *player;
 
-// }
+	player = game->player;
+	// move backward (S key)
+	player->sp_dir[X] += player->pdx * 5;
+	player->sp_dir[Y] += player->pdy * 5;
+}
 
 // int go_right(t_game *game)
 // {
@@ -197,9 +178,9 @@ void handle_input(void *param1)
 	if (mlx_is_key_down(game->mlx, MLX_KEY_ESCAPE))
 		mlx_close_window(game->mlx); // closes the window safely
 	if (mlx_is_key_down(game->mlx, MLX_KEY_RIGHT))
-		right_rotate(game);
+		right_rotate(game, game->player);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_LEFT))
-		left_rotate(game);
+		left_rotate(game, game->player);
 	// if (mlx_is_key_down(game->mlx, MLX_KEY_W))
 	// 	go_forward(game);
 	// if (mlx_is_key_down(game->mlx, MLX_KEY_A))
@@ -213,15 +194,16 @@ void handle_input(void *param1)
 }
 
 int main(int ac, char **av) {
-	t_map	*map;
-	t_game	game;
+	t_map		*map;
+	t_game		game;
+	t_player	player;
 
 	if (ac != 2) {
 		puts("Usage: ./cub3d <path/to/map.cub>");
 		return 1;
 	}
 	game.map = map;
-	map = loadmap(av[1], &game);
+	map = loadmap(av[1], &game, &player);
 	game.mlx = mlx_init(IMAC_WIDTH_DEBUG, IMAC_HEIGHT,"44", true);
 	if (!game.mlx)
 		ft_error();

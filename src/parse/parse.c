@@ -196,46 +196,47 @@ int is_player(char c)
 // 	return (0);
 // }
 
-// int	find_player(t_map *map, t_game *game)
-// {
-// 	int	i;
-// 	int	j;
+int	find_player(t_map *map, t_game *game, t_player *player)
+{
+	int	i;
+	int	j;
 
-// 	i = 0;
-// 	// copy_map(map);
-// 	map->not_valid = 0;
-// 	while (map->map[i])
-// 	{
-// 		j = 0;
-// 		while (map->map[i][j])
-// 		{
-// 			if (is_player(map->map[i][j]))
-// 			{
-// 				game->player_pos[X] = j;
-// 				game->player_pos[Y] = i;
-// 				if (game->player_pos[X])
-// 	    			game->sp_dir[X] = ((game->player_pos[X] * SQUARE_LEN) + game->player_pos[X]);
-// 				if (game->player_pos[Y])
-// 	    			game->sp_dir[Y] = ((game->player_pos[Y] * SQUARE_LEN) + game->player_pos[Y]);
-// 				game->sp_dir[X] += CENTER_RULE;
-// 				game->sp_dir[Y] += CENTER_RULE;
-// 				game->player_pos[X] = j;
-// 				game->player_pos[Y] = i;
-// 				printf ("sp_dir[X] : %d\n", game->sp_dir[X]);
-// 				printf ("sp_dir[Y] : %d\n", game->sp_dir[Y]);
-// 				printf ("player_pos[X] : %d\n", game->player_pos[X]);
-// 				printf ("player_pos[Y] : %d\n", game->player_pos[Y]);
-// 				// while (1);
-// 				return (0);
-// 			}
-// 			j ++;
-// 		}
-// 		i ++;
-// 	}
-// 	printf ("there is no player !\n");
-// 	exit(1);
-// 	// return (1);
-// }
+	i = 0;
+	// copy_map(map);
+	map->not_valid = 0;
+	while (map->map[i])
+	{
+		j = 0;
+		while (map->map[i][j])
+		{
+			if (is_player(map->map[i][j]))
+			{
+				// set player's current square
+				player->player_pos[X] = j;
+				player->player_pos[Y] = i;
+				// set players posiitio in pixels
+	    		player->sp_dir[X] = ((player->player_pos[X] * SQUARE_LEN));
+	    		player->sp_dir[Y] = ((player->player_pos[Y] * SQUARE_LEN));
+				player->sp_dir[X] += CENTER_RULE;
+				player->sp_dir[Y] += CENTER_RULE;
+				// debug
+				#ifdef DEBUG_PLAYERPOS
+				printf ("sp_dir[X] : %d\n", player->sp_dir[X]);
+				printf ("sp_dir[Y] : %d\n", player->sp_dir[Y]);
+				printf ("player_pos[X] : %d\n", player->player_pos[X]);
+				printf ("player_pos[Y] : %d\n", player->player_pos[Y]);
+				while (1);
+				#endif
+				return (0);
+			}
+			j ++;
+		}
+		i ++;
+	}
+	printf ("there is no player !\n");
+	exit(1);
+	// return (1);
+}
 
 // static int	check_map(t_map *map, t_game *game)
 // {
@@ -248,7 +249,6 @@ int is_player(char c)
 // 	i = 0;
 // 	copy_map(map);
 // 	map->not_valid = 0;
-// 	find_player(map, game);
 // 	flood_fill(map, game->player_pos[Y], game->player_pos[X]);
 // 	i = 0;
 // 	while (map->tmp_map[i])
@@ -297,21 +297,24 @@ int is_player(char c)
 // }
 
 
-static int map_data(t_game *game, t_map *map)
+static int map_data(t_game *game, t_map *map, t_player *player)
 {
-	game->ep_dir[X] = 90;
-	game->ep_dir[Y] = 0;
 	game->map = map;
+	game->player = player;
+	player->ep_dir[X] = -3;
+	player->ep_dir[Y] = -3;
+	player->pa = 90;
+	player->pdx = cos(player->pa * M_PI / 180.0);
+	player->pdy = -sin(player->pa * M_PI / 180.0);
 	return (0);
 }
 
 // TODO need way more verificatiosn and cehcks for the format
 // or maybe split into one for parse and one for checks
-t_map *loadmap(char *filename, t_game *game)
+t_map *loadmap(char *filename, t_game *game, t_player *player)
 {
 	t_map *map = malloc(sizeof(t_map));
 	map->success = false;
-
 	int f = open(filename, O_RDONLY);
 	if (f < 0)
 		return map;
@@ -322,9 +325,10 @@ t_map *loadmap(char *filename, t_game *game)
 		return map;
 	if (!setmap(map, f))
 		return map;
+	find_player(map, game, player);
 	// if (!check_map(map, game))
 	// 	return map;
-	if (!map_data(game, map))
+	if (!map_data(game, map, player))
 		return map;
 	map->success = true;
 	return map;
