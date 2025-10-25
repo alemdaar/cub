@@ -1,5 +1,5 @@
 NAME	:= cub3D
-# CFLAGS	:= -Wextra -Wall/ -Werror -Wunreachable-code -O3
+# CFLAGS	:= -Wextra -Wall -Werror -Wunreachable-code -O3
 # CFLAGS	:= -Wextra -Wall -Werror -Wunreachable-code -O3 -DDEBUG
 LIBMLX	:= ./lib/mlx42
 LIBGLFW := $(shell brew --prefix glfw)
@@ -7,8 +7,8 @@ LIBFT := lib/libft/libft.a
 
 HEADERS	:= -I src/ -I $(LIBMLX)/include
 LIBS	:= $(LIBMLX)/build/libmlx42.a $(LIBFT) -ldl $(LIBGLFW)/lib/libglfw3.a -lm -framework Cocoa -framework OpenGL -framework IOKit
-SRCS	:= test.c
-# SRCS	:= $(shell find ./src -iname "*.c") lib/gnl/get_next_line.c lib/gnl/get_next_line_utils.c
+# SRCS	:= test.c
+SRCS	:= $(shell find ./src -iname "*.c") lib/gnl/get_next_line.c lib/gnl/get_next_line_utils.c
 
 OBJS	:= ${SRCS:.c=.o}
 CC		:= cc
@@ -24,8 +24,8 @@ libmlx:
 libft:
 	make -C lib/libft
 
-# %.o: %.c src/main.h 
-%.o: %.c
+%.o: %.c src/main.h 
+# %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS)
 
 $(NAME): $(OBJS)

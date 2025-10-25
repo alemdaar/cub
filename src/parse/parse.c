@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+// #define DEBUG_PLAYERPOS
+
 int err_msg(const char *msg)
 {
 	write (2, msg, ft_strlen(msg));
@@ -196,7 +198,7 @@ int is_player(char c)
 // 	return (0);
 // }
 
-int	find_player(t_map *map, t_game *game, t_player *player)
+int	find_player(t_map *map, t_player *player)
 {
 	int	i;
 	int	j;
@@ -221,8 +223,8 @@ int	find_player(t_map *map, t_game *game, t_player *player)
 				player->sp_dir[Y] += CENTER_RULE;
 				// debug
 				#ifdef DEBUG_PLAYERPOS
-				printf ("sp_dir[X] : %d\n", player->sp_dir[X]);
-				printf ("sp_dir[Y] : %d\n", player->sp_dir[Y]);
+				printf ("sp_dir[X] : %f\n", player->sp_dir[X]);
+				printf ("sp_dir[Y] : %f\n", player->sp_dir[Y]);
 				printf ("player_pos[X] : %d\n", player->player_pos[X]);
 				printf ("player_pos[Y] : %d\n", player->player_pos[Y]);
 				while (1);
@@ -325,7 +327,7 @@ t_map *loadmap(char *filename, t_game *game, t_player *player)
 		return map;
 	if (!setmap(map, f))
 		return map;
-	find_player(map, game, player);
+	find_player(map, player);
 	// if (!check_map(map, game))
 	// 	return map;
 	if (!map_data(game, map, player))
