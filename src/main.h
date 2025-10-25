@@ -74,3 +74,4 @@ typedef struct s_game {
 
 
 t_map *loadmap(char *filename, t_game *game, t_player *player);
+int is_player(char c);

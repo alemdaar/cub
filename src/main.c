@@ -5,6 +5,7 @@
 
 // #define DEBUG_KTP 1
 // #define DEBUG_DS 1
+#define DEBUG_MOVE 1
 
 static void ft_error(void)
 {
@@ -23,7 +24,7 @@ void draw_circle(mlx_image_t *img, int cx, int cy, uint32_t color)
         {
             if (x * x + y * y <= radius * radius)
             {
-                int px = cx + x;
+                int px = (int)cx + x;
                 int py = cy + y;
                 if (px >= 0 && px < (int)img->width && py >= 0 && py < (int)img->height)
                     mlx_put_pixel(img, px, py, color);
@@ -117,14 +118,8 @@ void draw_2dsquare(t_game *game, t_map *map, int x, int y)
 	    ruley = (y * SQUARE_LEN);
 	if (flag == '1')
 		color = black;
-	else if (flag == '0')
+	else if (flag == '0' || is_player(flag))
 		color = green;
-	else if (flag == 'p' || flag == 'N')
-	{
-		color = green;
-		tmp_x = rulex;
-		tmp_y = ruley;
-	}
 	#ifdef DEBUG_DS
 	printf ("rulex : %d\n", rulex);
 	printf ("ruley : %d\n", ruley);
@@ -145,19 +140,23 @@ void draw_2dsquare(t_game *game, t_map *map, int x, int y)
 		i++;
 		
 	}
-	if (flag == 'P' || flag == 'N')
-	{
-		color = red;
-		x = player->sp_dir[X];
-		y = player->sp_dir[Y];
-		draw_direction(game, color);
-		draw_circle(game->img, x, y, color);
-	}
 }
 
+int draw_payer2d(t_game *game)
+{
+	t_player	*player;
+	uint32_t	color;
+
+	color = 0xFF0000FF;
+	player = game->player;
+	double x = player->sp_dir[X];
+	double y = player->sp_dir[Y];
+	draw_direction(game, color);
+	draw_circle(game->img, (int)x, (int)y, color);
+}
 int draw_2dmap (t_game *game)
 {
-	t_map *map;
+	t_map		*map;
 
 	map = game->map;
 	int i = 0;
@@ -172,6 +171,7 @@ int draw_2dmap (t_game *game)
 		}
 		i++;
 	}
+	draw_payer2d(game);
 	return 0;
 }
 int right_rotate(t_player *player)
@@ -208,7 +208,6 @@ int go_forward(t_game *game)
 
 	player = game->player;
 	map = game->map;
-	map->map[player->sp_dir[Y]][player->sp_dir[X]]= '0';
 	tmp1 = get_sqr(player->sp_dir[Y]);
 	tmp2 = get_sqr(player->sp_dir[X] + player->pdx);
 	if (map->map[tmp1][tmp2] != '1')
@@ -217,10 +216,23 @@ int go_forward(t_game *game)
 	tmp2 = get_sqr(player->sp_dir[X]);
 	if (map->map[tmp1][tmp2] != '1')
 		player->sp_dir[Y] += player->pdy;
+	map->map[player->player_pos[Y]][player->player_pos[X]] = '0';
 	player->player_pos[X] = get_sqr(player->sp_dir[X]);
 	player->player_pos[Y] = get_sqr(player->sp_dir[Y]);
-	map->map[player->sp_dir[Y]][player->sp_dir[X]]= 'P';
-
+	map->map[player->player_pos[Y]][player->player_pos[X]] = 'P';
+	#ifdef DEBUG_MOVE
+	int i = 0;
+	while (map->map[i])
+	{
+		printf ("map : %s\n", map->map[i]);
+		i++;
+	}
+	printf ("sqx : %d\n", player->player_pos[X]);
+	printf ("sqy : %d\n", player->player_pos[Y]);
+	printf ("px : %f\n", player->sp_dir[X]);
+	printf ("py : %f\n", player->sp_dir[Y]);
+	printf ("-------\n");
+	#endif
 	return (0);
 }
 
