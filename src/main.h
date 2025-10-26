@@ -17,9 +17,9 @@
 #define	FAILED				1
 #define	X					0
 #define	Y					1
-#define IMAC_WIDTH			5120
+#define IMAC_WIDTH			2560
 #define IMAC_WIDTH_DEBUG	1500
-#define IMAC_HEIGHT			2880
+#define IMAC_HEIGHT			1356
 #define RED					0xFF0000FF
 #define GREEN				0x00FF00FF
 #define BLACK				0x000000FF
@@ -27,6 +27,7 @@
 #define PLAYER_LEN			15
 #define CENTER_RULE			17
 #define MAP2D_LEN			5
+#define FOV					60
 // center of the player is [89 , 53]
 // the highest pixel of the player is [89 , 46]
 // the lowest pixel of the player is [89 , 40]
@@ -70,6 +71,7 @@ typedef struct s_game {
 	mlx_image_t*	img;
 	t_map			*map;
 	t_player		*player;
+	int				ray_hits[IMAC_WIDTH][2];
 } t_game;
 
 

@@ -1,5 +1,5 @@
 NAME	:= cub3D
-# CFLAGS	:= -Wextra -Wall -Werror -Wunreachable-code -O3
+CFLAGS	:= -Wextra -Wall -Werror -Wunreachable-code -O3
 # CFLAGS	:= -Wextra -Wall -Werror -Wunreachable-code -O3 -DDEBUG
 LIBMLX	:= ./lib/mlx42
 LIBGLFW := $(shell brew --prefix glfw)
@@ -24,8 +24,8 @@ libmlx:
 libft:
 	make -C lib/libft
 
-%.o: %.c src/main.h 
 # %.o: %.c
+%.o: %.c src/main.h 
 	$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS)
 
 $(NAME): $(OBJS)
