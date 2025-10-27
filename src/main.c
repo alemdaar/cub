@@ -9,6 +9,8 @@
 #define DEBUG_CAST_RAY 1
 // #define DEBUG_CAST_RAY_PREV 1
 #define DEBUG_RAY_ANGLE 1
+#define DEBUG_MAP_VISUAL 1
+// #define DEBUG_LINE_VIS 1
 
 static void ft_error(void)
 {
@@ -83,22 +85,28 @@ int draw_direction(t_game *game, uint32_t color)
 	return (0);
 }
 
-// int hit_wall(t_game *game, int ind, double x, double y, double pdx, double pdy, int debug)
 // int hit_wall(t_game *game, int ind, double x, double y)
-int hit_wall(t_game *game, int ind, double x, double y, int debug)
+// int hit_wall(t_game *game, int ind, double x, double y, int debug)
+int hit_wall(t_game *game, int ind, double x, double y, double pdx, double pdy, int debug)
 {
 	t_map *map;
+	t_player *player;
 
 	map = game->map;
+	player = game->player;
 	int sqx = get_sqr (x);
 	int sqy = get_sqr (y);
 	if (map->map[sqy][sqx] == '1')
 	{
 		game->ray_hits[ind][X] = x;
 		game->ray_hits[ind][Y] = y;
+		double dx = x - (player->sp_dir[X]);
+		double dy = y - (player->sp_dir[Y]);
+		game->ray_hits[ind][D] = sqrt(dx * dx + dy * dy);
 		#ifdef DEBUG_CAST_RAY
-		dprintf (debug, "%dx : %d\n", ind, game->ray_hits[ind][X]);
-		dprintf (debug, "%dy : %d\n", ind, game->ray_hits[ind][Y]);
+		dprintf (debug, "%dx : (prev(%f))<- %f -> %d : sqr : %d\n", ind, (x - pdx), x, (int)x, sqx);
+		dprintf (debug, "%dy : (prev(%f))<- %f -> %d : sqr : %d\n", ind, (y - pdy), y, (int)y, sqy);
+		dprintf (debug, "(prev) %f <- distance : %f\n", (dx * dx + dy * dy), sqrt(dx * dx + dy * dy));
 		#ifdef DEBUG_CAST_RAY_PREV
 		dprintf (debug, "%d prev x : %f\n", ind, ((game->ray_hits[ind][X]) - pdx));
 		dprintf (debug, "%d prev y : %f\n", ind, ((game->ray_hits[ind][Y]) - pdy));
@@ -122,11 +130,13 @@ int cast_ray2(t_game *game, int ind, double dir, int debug)
 	int i = 0;
 	while (1)
 	{
-		// if (hit_wall(game, ind, x, y, pdx, pdy, debug))
 		// if (hit_wall(game, ind, x, y))
-		if (hit_wall(game, ind, x, y, debug))
+		// if (hit_wall(game, ind, x, y, debug))
+		if (hit_wall(game, ind, x, y, pdx, pdy, debug))
 			return (0);
-        mlx_put_pixel(game->img, round(x), round(y), 0x8B4513FF);
+		// if (round(x) == 432 && round(y) == 34)
+		// 	printf ("yes\n");
+        mlx_put_pixel(game->img, (int)x, (int)y, 0x8B4513FF);
 		x += pdx;
 		y += pdy;
 		i++;
@@ -170,9 +180,6 @@ void draw_2dsquare(t_game *game, t_map *map, int x, int y)
 	player = game->player;
 	rulex = 0;
 	ruley = 0;
-	#ifdef DEBUG_KTP
-	printf (".....\n");
-	#endif
 	flag = map->map[y][x];
 	rulex = get_pixel(x);
 	ruley = get_pixel(y);
@@ -212,6 +219,7 @@ int draw_payer2d(t_game *game)
 	draw_circle(game->img, (int)x, (int)y, color);
 	return (0);
 }
+
 int cast_ray(t_game *game)
 {
 	t_player	*player;
@@ -235,6 +243,17 @@ int cast_ray(t_game *game)
 		// cast_ray2(game, ray, ray_angle);
 		ray++;
 	}
+	#ifdef DEBUG_LINE_VIS
+	int i = 0;
+	int x = 432;
+	int y = 34;
+	while (i < 100)
+	{
+		mlx_put_pixel(game->img, x, y, 0xFF0000FF);
+		y++;
+		i++;
+	}
+	#endif
 	return (0);
 }
 
@@ -245,6 +264,7 @@ int draw_2dmap (t_game *game)
 	map = game->map;
 	int i = 0;
 	int j;
+	// int tmp = 0;
 	while (map->map[i])
 	{
 		j = 0;
@@ -253,6 +273,15 @@ int draw_2dmap (t_game *game)
 			draw_2dsquare(game, map, j, i);
 			j++;
 		}
+		// tmp = 0;
+		// int x = get_pixel(j);
+		// int y = get_pixel(i);
+
+		// while (tmp < 100)
+		// {
+		// 	mlx_put_pixel(game->img, (j + rulex), (i + ruley), color);
+		// 	tmp++;
+		// }
 		i++;
 	}
 	draw_payer2d(game);

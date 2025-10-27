@@ -17,6 +17,7 @@
 #define	FAILED				1
 #define	X					0
 #define	Y					1
+#define	D					1
 #define IMAC_WIDTH			2560
 #define IMAC_WIDTH_DEBUG	1500
 #define IMAC_HEIGHT			1356
@@ -71,7 +72,7 @@ typedef struct s_game {
 	mlx_image_t*	img;
 	t_map			*map;
 	t_player		*player;
-	int				ray_hits[IMAC_WIDTH][2];
+	double			ray_hits[IMAC_WIDTH][3];
 } t_game;
 
 
