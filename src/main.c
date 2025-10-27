@@ -6,10 +6,10 @@
 // #define DEBUG_KTP 1
 // #define DEBUG_DS 1
 // #define DEBUG_MOVE 1
-#define DEBUG_CAST_RAY 1
+// #define DEBUG_CAST_RAY 1
 // #define DEBUG_CAST_RAY_PREV 1
-#define DEBUG_RAY_ANGLE 1
-#define DEBUG_MAP_VISUAL 1
+// #define DEBUG_RAY_ANGLE 1
+// #define DEBUG_MAP_VISUAL 1
 // #define DEBUG_LINE_VIS 1
 
 static void ft_error(void)
@@ -85,9 +85,9 @@ int draw_direction(t_game *game, uint32_t color)
 	return (0);
 }
 
-// int hit_wall(t_game *game, int ind, double x, double y)
 // int hit_wall(t_game *game, int ind, double x, double y, int debug)
-int hit_wall(t_game *game, int ind, double x, double y, double pdx, double pdy, int debug)
+// int hit_wall(t_game *game, int ind, double x, double y, double pdx, double pdy, int debug)
+int hit_wall(t_game *game, int ind, double x, double y)
 {
 	t_map *map;
 	t_player *player;
@@ -104,9 +104,9 @@ int hit_wall(t_game *game, int ind, double x, double y, double pdx, double pdy, 
 		double dy = y - (player->sp_dir[Y]);
 		game->ray_hits[ind][D] = sqrt(dx * dx + dy * dy);
 		#ifdef DEBUG_CAST_RAY
-		dprintf (debug, "%dx : (prev(%f))<- %f -> %d : sqr : %d\n", ind, (x - pdx), x, (int)x, sqx);
-		dprintf (debug, "%dy : (prev(%f))<- %f -> %d : sqr : %d\n", ind, (y - pdy), y, (int)y, sqy);
-		dprintf (debug, "(prev) %f <- distance : %f\n", (dx * dx + dy * dy), sqrt(dx * dx + dy * dy));
+		dprintf (debug, "%dx : (prev(%f))<- %f -> %d : sqr : %d, dx : %f\n", ind, (x - pdx), x, (int)x, sqx, dx);
+		dprintf (debug, "%dy : (prev(%f))<- %f -> %d : sqr : %d, dy : %f\n", ind, (y - pdy), y, (int)y, sqy, dy);
+		dprintf (debug, "dx : %f - dy : %f --- (prev) %f <- distance : %f\n", (dx * dx), (dy * dy), (dx * dx + dy * dy), sqrt(dx * dx + dy * dy));
 		#ifdef DEBUG_CAST_RAY_PREV
 		dprintf (debug, "%d prev x : %f\n", ind, ((game->ray_hits[ind][X]) - pdx));
 		dprintf (debug, "%d prev y : %f\n", ind, ((game->ray_hits[ind][Y]) - pdy));
@@ -117,8 +117,8 @@ int hit_wall(t_game *game, int ind, double x, double y, double pdx, double pdy, 
 	return (0);
 }
 
-int cast_ray2(t_game *game, int ind, double dir, int debug)
-// int cast_ray2(t_game *game, int ind, double dir)
+// int cast_ray2(t_game *game, int ind, double dir, int debug)
+int cast_ray2(t_game *game, int ind, double dir)
 {
 	t_player *player;
 
@@ -130,9 +130,9 @@ int cast_ray2(t_game *game, int ind, double dir, int debug)
 	int i = 0;
 	while (1)
 	{
-		// if (hit_wall(game, ind, x, y))
 		// if (hit_wall(game, ind, x, y, debug))
-		if (hit_wall(game, ind, x, y, pdx, pdy, debug))
+		// if (hit_wall(game, ind, x, y, pdx, pdy, debug))
+		if (hit_wall(game, ind, x, y))
 			return (0);
 		// if (round(x) == 432 && round(y) == 34)
 		// 	printf ("yes\n");
@@ -227,20 +227,22 @@ int cast_ray(t_game *game)
 
 	player = game->player;
 	ray = 0;
+	#ifdef DEBUG_OPEN_FILE
 	int debug = open ("debug", O_RDWR);
 	if (debug == -1)
 	{
 		printf ("error debug file\n");
 		return (1);
 	}
+	#endif
 	while (ray < IMAC_WIDTH)
 	{
 	    double ray_angle = player->pa - (FOV / 2) + ((double)ray / IMAC_WIDTH) * FOV;
 		#ifdef DEBUG_RAY_ANGLE
 		dprintf (debug, "angle : %f\n", ray_angle);
 		#endif
-		cast_ray2(game, ray, ray_angle, debug);
-		// cast_ray2(game, ray, ray_angle);
+		// cast_ray2(game, ray, ray_angle, debug);
+		cast_ray2(game, ray, ray_angle);
 		ray++;
 	}
 	#ifdef DEBUG_LINE_VIS
@@ -369,11 +371,29 @@ int go_back(t_game *game)
 	return (0);
 }
 
-// int go_right(t_game *game)
-// {
+int go_right(t_game *game)
+{
+	t_player *player;
+	t_map *map;
+	int tmp1;
+	int tmp2;
 
-// }
-
+	player = game->player;
+	map = game->map;
+	tmp1 = get_sqr(player->sp_dir[Y]);
+	tmp2 = get_sqr(player->sp_dir[X] + player->pdx);
+	if (map->map[tmp1][tmp2] != '1')
+		player->sp_dir[X] += player->pdx;
+	tmp1 = get_sqr(player->sp_dir[Y] + player->pdy);
+	tmp2 = get_sqr(player->sp_dir[X]);
+	if (map->map[tmp1][tmp2] != '1')
+		player->sp_dir[Y] += player->pdy;
+	map->map[player->player_pos[Y]][player->player_pos[X]] = '0';
+	player->player_pos[X] = get_sqr(player->sp_dir[X]);
+	player->player_pos[Y] = get_sqr(player->sp_dir[Y]);
+	map->map[player->player_pos[Y]][player->player_pos[X]] = 'P';
+	return (0);
+}
 // int go_left(t_game *game)
 // {
 

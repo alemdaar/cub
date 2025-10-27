@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 int main ()
 {
@@ -10,16 +11,14 @@ int main ()
     2559y : 34.532352 -> 34
 
     */
-    double x1 = 420.000000;
-    double x2 = 145.607353;
-    double y1 = 83.957751;
-    double y2 = 34.532352;
-    int tx1 = (int)x1;
-    int tx2 = (int)x2;
-    int ty1 = (int)y1;
-    int ty2 = (int)y2;
-    printf ("%d\n", tx1);
-    printf ("%d\n", tx2);
-    printf ("%d\n", ty1);
-    printf ("%d\n", ty2);
+    /*
+    151.392647
+    -262.467648
+    */
+    double dx = 5.55;
+    double dy = 5.55;
+    printf ("dx2 : %f\n", (dx * dx));
+    printf ("dy2 : %f\n", (dy * dy));
+    printf ("(dx * dx + dy * dy) : %f\n", (dx * dx + dy * dy));
+    printf ("sqrt(dx * dx + dy * dy) : %f\n", sqrt(dx * dx + dy * dy));
 }
