@@ -287,7 +287,6 @@ int draw_2dmap (t_game *game)
 		i++;
 	}
 	draw_payer2d(game);
-	cast_ray(game);
 	return 0;
 }
 int right_rotate(t_player *player)
@@ -443,6 +442,7 @@ int main(int ac, char **av) {
 	if (!game.img || (mlx_image_to_window(game.mlx, game.img, 0, 0) < 0))
 		ft_error();
 	draw_2dmap (&game);
+	cast_ray(game);
 	mlx_loop_hook(game.mlx, handle_input, &game);
 	mlx_loop(game.mlx);
 	mlx_terminate(game.mlx);
